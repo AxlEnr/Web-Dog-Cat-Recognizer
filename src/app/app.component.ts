@@ -59,7 +59,7 @@ export class AppComponent implements OnInit {
     const target = event.target as HTMLInputElement;
     if (target.files && target.files.length > 0) {
       this.imageFile = target.files[0];
-      this.prediction = null; // Resetea la predicción anterior
+      this.prediction = null; 
 
       // Crear vista previa de la imagen
       const reader = new FileReader();
