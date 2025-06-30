@@ -17,8 +17,9 @@ export class AppComponent implements OnInit {
 
   private resnetModel?: tf.GraphModel;
   private vgg16Model?: tf.GraphModel;
+  private mobilenetModel?: tf.GraphModel;
 
-  selectedModel: 'resnet' | 'vgg16' = 'vgg16';
+  selectedModel: 'resnet' | 'mobilenet' | 'vgg16' = 'vgg16';
   imagePreviewUrl: string | ArrayBuffer | null = null;
   imageFile: File | null = null;
   prediction: 'Perro' | 'Gato' | null = null;
@@ -29,7 +30,6 @@ export class AppComponent implements OnInit {
     if (isPlatformBrowser(this.platformId)) {
       this.loadModels();
     } else {
-      console.log('Omitiendo la carga de modelos en el SERVIDOR.');
       this.loading = false;
     }
   }
@@ -38,9 +38,10 @@ export class AppComponent implements OnInit {
     try {
       this.loading = true;
       console.log('Cargando modelos...');
-      [this.resnetModel, this.vgg16Model] = await Promise.all([
+      [this.resnetModel, this.vgg16Model, this.mobilenetModel] = await Promise.all([
         tf.loadGraphModel('/assets/resnet_tfjs_model_dir/model.json'),
-        tf.loadGraphModel('/assets/vgg16_tfjs_model_dir/model.json')
+        tf.loadGraphModel('/assets/vgg16_tfjs_model_dir/model.json'),
+        tf.loadGraphModel('/assets/mobilenet_tfjs_model_dir/model.json')
       ]);
       console.log('Modelos cargados exitosamente.');
       this.modelsLoaded = true;
@@ -51,6 +52,7 @@ export class AppComponent implements OnInit {
       this.loading = false;
     }
   }
+
 
   onFileSelected(event: Event): void {
     const target = event.target as HTMLInputElement;
@@ -67,7 +69,7 @@ export class AppComponent implements OnInit {
   }
 
   async startPrediction(): Promise<void> {
-    if (!this.imageFile || (!this.resnetModel || !this.vgg16Model)) {
+    if (!this.imageFile || (!this.resnetModel || !this.vgg16Model || !this.mobilenetModel)) {
       console.error('Archivo o modelo no disponible.');
       return;
     }
@@ -88,7 +90,11 @@ export class AppComponent implements OnInit {
 
         const batched = normalized.expandDims(0);
 
-        const modelToUse = this.selectedModel === 'resnet' ? this.resnetModel : this.vgg16Model;
+        const modelToUse = this.selectedModel === 'resnet'
+          ? this.resnetModel
+          : this.selectedModel === 'vgg16'
+            ? this.vgg16Model
+            : this.mobilenetModel;
         return modelToUse?.predict(batched) as tf.Tensor;
       });
 

@@ -32,6 +32,11 @@
                 "glob": "**/*",
                 "input": "src/assets/vgg16_tfjs_model_dir",
                 "output": "assets/vgg16_tfjs_model_dir"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/assets/mobilenet_tfjs_model_dir",
+                "output": "assets/mobilenet_tfjs_model_dir"
               }
             ],
             "styles": [

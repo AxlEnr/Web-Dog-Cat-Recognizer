@@ -6,12 +6,6 @@ const angularAppEngine = new AngularAppEngine()
 export async function netlifyAppEngineHandler(request: Request): Promise<Response> {
   const context = getContext()
 
-  // Puedes agregar tus endpoints personalizados aquí:
-  // const pathname = new URL(request.url).pathname;
-  // if (pathname === '/api/hello') {
-  //   return Response.json({ message: 'Hola desde Netlify SSR API' });
-  // }
-
   const result = await angularAppEngine.handle(request, context)
   return result || new Response('Not found', { status: 404 })
 }
