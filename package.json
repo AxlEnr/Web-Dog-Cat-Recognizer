@@ -9,6 +9,9 @@
     "test": "ng test",
     "serve:ssr:PredictionAPp": "node dist/prediction-app/server/server.mjs"
   },
+  "engines": {
+  "node": "20.x"
+  },
   "private": true,
   "dependencies": {
     "@angular/common": "^19.2.0",
