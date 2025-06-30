@@ -1,2 +1,15 @@
-[build.environment]
-  NODE_VERSION = "20"
+[build]
+  command = "npm run build:ssr"
+  publish = "dist/prediction-app/browser"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+[[plugins]]
+  package = "@netlify/angular-runtime"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

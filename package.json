@@ -7,7 +7,8 @@
     "build": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:PredictionAPp": "node dist/prediction-app/server/server.mjs"
+    "build:ssr": "ng build --configuration production && ng run prediction-app:server:production",
+    "serve:ssr": "node dist/prediction-app/server/server.mjs"
   },
   "engines": {
   "node": "20.x"
