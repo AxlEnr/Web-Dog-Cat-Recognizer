@@ -10,17 +10,14 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  // Estado de la Carga
   loading = true;
   modelsLoaded = false;
   predicting = false;
   error?: string;
 
-  // Modelos de IA
   private resnetModel?: tf.GraphModel;
   private vgg16Model?: tf.GraphModel;
 
-  // Datos de la Interfaz
   selectedModel: 'resnet' | 'vgg16' = 'vgg16';
   imagePreviewUrl: string | ArrayBuffer | null = null;
   imageFile: File | null = null;
@@ -61,7 +58,6 @@ export class AppComponent implements OnInit {
       this.imageFile = target.files[0];
       this.prediction = null; 
 
-      // Crear vista previa de la imagen
       const reader = new FileReader();
       reader.onload = () => {
         this.imagePreviewUrl = reader.result;
@@ -79,39 +75,28 @@ export class AppComponent implements OnInit {
     this.predicting = true;
     this.prediction = null;
 
-    // Crear un elemento de imagen para que TFJS pueda procesarlo
     const imageElement = document.createElement('img');
     imageElement.src = this.imagePreviewUrl as string;
 
     imageElement.onload = async () => {
-      // tf.tidy() limpia la memoria de los tensores automáticamente
       const result = tf.tidy(() => {
-        // 1. Convertir la imagen a un tensor
+
         const imgTensor = tf.browser.fromPixels(imageElement).toFloat();
 
-        // 2. Pre-procesamiento: Redimensionar y normalizar
-        // Los modelos como ResNet/VGG16 esperan un tamaño específico (ej. 224x224)
-        // La normalización depende de cómo fue entrenado el modelo.
-        // Una normalización común es escalar los pixeles de 0-255 a 0-1.
         const resized = tf.image.resizeBilinear(imgTensor, [224, 224]);
         const normalized = resized.div(255.0);
 
-        // 3. Añadir una dimensión de "batch" (lote)
-        // La forma pasa de [224, 224, 3] a [1, 224, 224, 3]
         const batched = normalized.expandDims(0);
-        
-        // 4. Seleccionar el modelo y predecir
+
         const modelToUse = this.selectedModel === 'resnet' ? this.resnetModel : this.vgg16Model;
         return modelToUse?.predict(batched) as tf.Tensor;
       });
 
-      // 5. Interpretar el resultado
-      const predictionData = await result.data();
-      result.dispose(); // Liberar memoria del tensor de resultado
 
-      // Suponemos que el modelo devuelve un solo número.
-      // < 0.5 = Gato, > 0.5 = Perro (esto puede variar según tu modelo)
-      this.prediction = predictionData[0] > 0.5 ? 'Perro' : 'Gato';
+      const predictionData = await result.data();
+      result.dispose();
+
+      this.prediction = predictionData[0] > 0.5 ? 'Gato' : 'Perro';
       
       this.predicting = false;
     };
